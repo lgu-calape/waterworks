@@ -45,13 +45,21 @@ function record_usage() {
   console.log('click');
   let x = new XMLHttpRequest();
 
+  if( used.value < 1 ) return;
+
+  if( isNaN(used.value) ) return;
+
   x.addEventListener('readystatechange',()=>{
     if( x.readyState === 1 ) {
-      // ...
+      btn1.setAttribute('aria-busy',true);
     }
 
     if( x.readyState === 4 ) {
-      // ...
+      if( x.status === 200 ) {
+        btn1.innerText = 'RECORDED';
+        btn1.disabled = true;
+        btn1.removeAttribute('aria-busy');
+      }
     }
   });
 

@@ -4,7 +4,7 @@ $req = $_SERVER['REQUEST_METHOD'];
 
 require_once '../dbase.php';
 
-if( $req === 'POST' ) {
+if ( $req === 'POST' ) {
   $d = file_get_contents('php://input');
   $d = base64_decode($d);
   $d = json_decode($d);
@@ -13,20 +13,25 @@ if( $req === 'POST' ) {
 
   $db = new Database();
 
-  $r = $db->get_user_role($user, $pass);
+  $uid = $db->get_user_id($user, $pass);
 
-  if( $r === false ) {
+  if ( $uid === false ) {
     http_response_code(403);
     exit;
   }
 
-  if( $r['role'] === 1 )
+  setcookie('uid', $uid, time()+3600*4);
+
+  $role = $db->get_user_role($uid);
+
+
+  if ( $role === 1 )
     header('location: ../admin.html');
 
-  if( $r['role'] === 2 )
+  if ( $role === 2 )
     header('location: ../cashier.html');
 
-  if( $r['role'] === 3 )
+  if ( $role === 3 )
     header('location: ../reader.html');
 
   exit;
