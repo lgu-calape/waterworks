@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://unpkg.com/@picocss/pico@1.4.4/css/pico.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"> 
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+<link href="https://fonts.googleapis.com/css2?family=Kdam+Thmor+Pro&display=swap" rel="stylesheet">
+<title>Meter Reading</title>
+<style>
+body{font-family: "Kdam Thmor Pro";}
+input{text-transform: uppercase;}
+</style>    
+</head>
+<body>
+<main class="container">
+  <article>
+    <h3>Name: <span id="name">...</span> / Meter: <span id="mtrn">...<span></h3>
+    <input type="number" id="m3_used" placeholder="cubic used" min="1" max="999">
+    <button id="btn1">RECORD</button>
+    <br><hr><br>
+    <button class="secondary" onclick="location.assign('consumer_lookup.html');">LOOK UP</button>
+    <br><p style="text-align:center;">You are reading in barangay <span id="brgy">...</span></p>
+  </article>
+</main>
+<script>
+const name = document.getElementById('name'),
+      mtrn = document.getElementById('mtrn'),
+      btn1 = document.getElementById('btn1'),
+      brgy = document.getElementById('brgy'),
+      used = document.getElementById('m3_used'),
+      data = localStorage.getItem('record'),
+      addr = localStorage.getItem('brgy_name');
+
+const obj = JSON.parse(data);
+
+function init() {
+  name.innerText = obj.name;
+  mtrn.innerText = obj.meter_no;
+  brgy.innerText = addr;
+}
+
+function record_usage() {
+  console.log('click');
+  let x = new XMLHttpRequest();
+
+  x.addEventListener('readystatechange',()=>{
+    if( x.readyState === 1 ) {
+      // ...
+    }
+
+    if( x.readyState === 4 ) {
+      // ...
+    }
+  });
+
+  x.open('POST', 'api/record_usage.php');
+  x.send(btoa([obj.id,used.value]));
+}
+
+btn1.addEventListener('click',record_usage);
+
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>

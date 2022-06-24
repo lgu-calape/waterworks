@@ -31,7 +31,7 @@ class Database extends SQLite3 {
   }
 
   public function get_consumer_by_brgy($brgy_id) {
-    $p = $this->prepare("SELECT name,meter_number FROM consumber WHERE brgy_id=:bid");
+    $p = $this->prepare("SELECT id,name,meter_no FROM consumer WHERE barangay_id=:bid");
     $p->bindParam(":bid", $brgy_id);
 
     $x = $p->execute();
