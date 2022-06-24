@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://unpkg.com/@picocss/pico@1.4.4/css/pico.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"> 
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+<link href="https://fonts.googleapis.com/css2?family=Kdam+Thmor+Pro&display=swap" rel="stylesheet">
+<title>Meter Reading</title>
+<style>
+body{font-family: "Kdam Thmor Pro";}
+input{text-transform: uppercase;}
+</style>    
+</head>
+<body>
+<main class="container">
+  <article>
+    <select id="brgy">
+      <option>SELECT BARANGAY</option>
+    </select>
+    <button id="btn1">START READING</button>
+  </article>
+</main>
+<script>
+const brgy = document.getElementById('brgy'),
+      btn1 = document.getElementById('btn1');
+
+function get_brgy() {
+  let x = new XMLHttpRequest();
+
+  x.addEventListener('readystatechange',()=>{
+    if( x.readyState === 1 ) {
+      btn1.disabled = true;
+    }
+
+    if( x.readyState === 4 ) {
+      if( x.status === 200 ) {
+        let d = JSON.parse(x.responseText);
+
+        d.forEach((i)=>{
+          let o = document.createElement('option');
+          o.text = i.name;
+          o.value = i.id;
+
+          brgy.add(o);
+        });
+      }
+    }
+  });
+
+  x.open('GET','api/barangay.php');
+  x.send();
+}
+
+function reading() {
+  if( brgy.value > 0 ) {
+    location.assign('reading.html');
+  }
+}
+
+function select_brgy() {
+  btn1.disabled = true;
+
+  if( brgy.value > 0 ) {
+    localStorage.setItem('brgy_id', brgy.value);
+    localStorage.setItem('brgy_name', brgy.options[brgy.selectedIndex].text);
+    btn1.disabled = false;
+  }
+}
+
+document.addEventListener('DOMContentLoaded',get_brgy);
+
+brgy.addEventListener('change',select_brgy);
+btn1.addEventListener('click',reading);
+</script>
+</body>
+</html>

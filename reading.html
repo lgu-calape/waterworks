@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://unpkg.com/@picocss/pico@1.4.4/css/pico.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"> 
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+<link href="https://fonts.googleapis.com/css2?family=Kdam+Thmor+Pro&display=swap" rel="stylesheet">
+<title>Meter Reading</title>
+<style>
+body{font-family: "Kdam Thmor Pro";}
+input{text-transform: uppercase;}
+</style>    
+</head>
+<body>
+<main class="container">
+  <article>
+    <input type="text" id="consumber" placeholder="consumer name / meter #">
+    <input type="number" id="m3_used" placeholder="cubic used" min="1" max="999">
+    <button>RECORD</button>
+    <br><hr><br>
+    <button class="secondary" onclick="location.assign('login.html');">LOGOUT</button>
+    <br><p style="text-align:center;">You are reading in barangay <span id="brgy">...</span></p>
+  </article>
+</main>
+<script>
+const brgy = document.getElementById('brgy');
+
+brgy.innerText = localStorage.getItem('brgy_name');
+
+function get_consumber() {
+  let x = new XMLHttpRequest();
+
+  x.addEventListener('readystatechange',()={
+    if( x.readyState === 1 ) {
+    }
+
+    if( x.readyState === 4 ) {
+      console.log(x.responseText);
+    }
+  });
+
+  x.open('GET', 'api/consumber_by_brgy.php?id='+localStorage.getItem('brgy_id'));
+  x.send();
+}
+
+</script>
+</body>
+</html>

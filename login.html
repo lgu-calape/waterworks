@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://unpkg.com/@picocss/pico@1.4.4/css/pico.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"> 
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+<link href="https://fonts.googleapis.com/css2?family=Kdam+Thmor+Pro&display=swap" rel="stylesheet">
+<title>Meter Reading</title>
+<style>
+body{font-family: "Kdam Thmor Pro";}
+input{text-transform: uppercase;}
+</style>    
+</head>
+<body>
+<main class="container">
+  <article>
+    <input type="text" id="user" placeholder="username">
+    <input type="password" id="pass" placeholder="password">
+    <button id="btn1">LOGIN</button>
+  </article>
+</main>
+
+<script>
+const user = document.getElementById('user'),
+      pass = document.getElementById('pass'),
+      btn1 = document.getElementById('btn1');
+
+function alert(s) {
+  let p = document.createElement('p');
+
+  p.style.background = 'red';
+  p.style.color = '#fff';
+  p.style.position = 'absolute';
+  p.style.top = '0';
+  p.style.left = '0';
+  p.style.right = '0';
+  p.style.textAlign = 'center';
+  p.style.padding = '10px';
+
+  p.innerText = s;
+
+  document.body.append(p);
+
+  setTimeout(()=>p.remove(),3000);
+}
+
+function login() {
+  let x = new XMLHttpRequest(),
+      u = user.value, p = pass.value;
+
+  if( u.length < 3 || p.length < 4 ) {
+    alert('Enter username and password');
+    return;
+  }
+
+  x.addEventListener('readystatechange',()=>{
+
+    if( x.readyState === 1 ) {
+      btn1.setAttribute('aria-busy', true);
+    }
+
+    if( x.readyState === 4 ) {
+      if( x.status === 200 ) {
+        location.assign(x.responseURL);
+      }
+
+      if( x.status === 403 ) {
+        alert('forbidden');
+      }
+
+      btn1.removeAttribute('aria-busy');
+    }
+
+    console.log('checking....');
+  });
+
+  x.open('POST','api/login.php');
+  x.send(btoa(JSON.stringify([u,p])));
+}  
+
+btn1.addEventListener('click',login);
+</script>
+</body>
+</html>
