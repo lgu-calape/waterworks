@@ -15,15 +15,17 @@ if ( $req === 'POST' ) {
 
   $uid = $db->get_user_id($user, $pass);
 
-  if ( $uid === false ) {
-    http_response_code(403);
-    exit;
-  }
+  if ( $uid === false )
+    exit(http_response_code(403));
 
-  setcookie('uid', $uid, time()+3600*4);
+  $ts = time() * 1000;
+  $sid = hash('sha256', $uid.$ts);
+
+  $db->session_set($sid,$uid,$ts);
+
+  setcookie('sid', $sid, time()+3600*4);
 
   $role = $db->get_user_role($uid);
-
 
   if ( $role === 1 )
     header('location: ../admin.html');

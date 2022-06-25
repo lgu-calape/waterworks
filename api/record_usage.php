@@ -3,7 +3,18 @@ require_once '../dbase.php';
 
 $req = $_SERVER['REQUEST_METHOD'];
 
-if( $req === 'POST' ) {
+if ( !isset($_COOKIE['sid']) )
+  exit(http_response_code(403));
+
+$db = new Database();
+
+$sid = $_COOKIE['sid'];
+
+$rid = $db->session_get($sid);
+
+if( !$rid ) exit(http_response_code(403));
+
+if ( $req === 'POST' ) {
   $d = file_get_contents('php://input');
   $d = base64_decode($d);
 
@@ -12,11 +23,7 @@ if( $req === 'POST' ) {
   $cid = filter_var($n1, FILTER_VALIDATE_INT);
   $amt = filter_var($n2, FILTER_VALIDATE_FLOAT);
 
-  $rid = filter_var($_COOKIE['uid'], FILTER_VALIDATE_INT);
-
-  $db = new Database();
-
-  var_dump($db->record_usage($cid,$rid, $amt));
+  $db->record_usage($cid,$rid, $amt);
 
   exit;
 }

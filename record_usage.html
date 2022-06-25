@@ -11,6 +11,7 @@
 <style>
 body{font-family: "Kdam Thmor Pro";}
 input{text-transform: uppercase;}
+#prevr{background:#888;color:#fff;padding:0.75rem 1rem;border-radius:0.25rem;text-align:center;}
 </style>    
 </head>
 <body>
@@ -19,6 +20,15 @@ input{text-transform: uppercase;}
     <h3>Name: <span id="name">...</span> / Meter: <span id="mtrn">...<span></h3>
     <input type="number" id="m3_used" placeholder="cubic used" min="1" max="999">
     <button id="btn1">RECORD</button>
+    <h6 id="prevr">PREVIOUS READINGS</h6>
+    <table id="tbl1">
+      <thead>
+        <tr><th>Date</th><th>Reading</th></tr>
+      </thead>
+      <tbody>
+        <!-- populate data -->
+      </tbody>
+    </table>
     <br><hr><br>
     <button class="secondary" onclick="location.assign('consumer_lookup.html');">LOOK UP</button>
     <br><p style="text-align:center;">You are reading in barangay <span id="brgy">...</span></p>
@@ -34,12 +44,6 @@ const name = document.getElementById('name'),
       addr = localStorage.getItem('brgy_name');
 
 const obj = JSON.parse(data);
-
-function init() {
-  name.innerText = obj.name;
-  mtrn.innerText = obj.meter_no;
-  brgy.innerText = addr;
-}
 
 function record_usage() {
   console.log('click');
@@ -60,11 +64,72 @@ function record_usage() {
         btn1.disabled = true;
         btn1.removeAttribute('aria-busy');
       }
+
+      if( x.status === 403 ) {
+        alert('error: session expired.');
+      }
     }
   });
 
   x.open('POST', 'api/record_usage.php');
   x.send(btoa([obj.id,used.value]));
+}
+
+const prevr = document.getElementById('prevr');
+
+function get_readings() {
+  let x = new XMLHttpRequest();
+
+  x.addEventListener('readystatechange',()=>{
+    if( x.readyState === 1 ) {
+      //...
+    }
+
+    if( x.readyState === 4 ) {
+      if( x.status === 200 ) {
+        JSON.parse(x.responseText).forEach(o=>displayTable(o))
+        prevr.removeAttribute('aria-busy');
+        tbl1.style.display = 'inline-table';
+      }
+
+      if( x.status === 204 ) {
+        prevr.remove();tbl1.remove();
+      }
+    }
+  });
+
+  x.open('GET','api/readings.php?consumer_id='+obj.id);
+  x.send();
+}
+
+function displayTable(o) {
+  let tb = tbl1.getElementsByTagName('tbody')[0];
+
+  let r0 = tb.insertRow(-1),
+      c0 = r0.insertCell(0),
+      c1 = r0.insertCell(1);
+
+  c0.innerText = utc2local(o.created_at);
+  c1.innerText = cubicmtr(o.m3_used);
+}
+
+function utc2local(ts) {
+  return new Date(parseInt(ts)).toLocaleString("en-US", {timeZone: 'Asia/Manila', hour12: true});
+}
+
+function cubicmtr(n) {
+  return `${n}\u33A5`;
+}
+
+function init() {
+  name.innerText = obj.name;
+  mtrn.innerText = obj.meter_no;
+  brgy.innerText = addr;
+
+  prevr.setAttribute('aria-busy',true);
+  tbl1.style.display = 'none';
+
+  setTimeout(get_readings,300);
 }
 
 btn1.addEventListener('click',record_usage);
