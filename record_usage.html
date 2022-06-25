@@ -18,12 +18,12 @@ input{text-transform: uppercase;}
 <main class="container">
   <article>
     <h3>Name: <span id="name">...</span> / Meter: <span id="mtrn">...<span></h3>
-    <input type="number" id="m3_used" placeholder="cubic used" min="1" max="999">
+    <input type="number" id="mtr1" placeholder="meter reading">
     <button id="btn1">RECORD</button>
     <h6 id="prevr">PREVIOUS READINGS</h6>
     <table id="tbl1">
       <thead>
-        <tr><th>Date</th><th>Reading</th></tr>
+        <tr><th>DATE</th><th>READING</th><th>USED&#x33A5;</th></tr>
       </thead>
       <tbody>
         <!-- populate data -->
@@ -39,19 +39,21 @@ const name = document.getElementById('name'),
       mtrn = document.getElementById('mtrn'),
       btn1 = document.getElementById('btn1'),
       brgy = document.getElementById('brgy'),
-      used = document.getElementById('m3_used'),
+      mtr1 = document.getElementById('mtr1'),
       data = localStorage.getItem('record'),
       addr = localStorage.getItem('brgy_name');
 
 const obj = JSON.parse(data);
 
+var lastlog = 0;
+
 function record_usage() {
-  console.log('click');
-  let x = new XMLHttpRequest();
+  let x = new XMLHttpRequest(),
+      n = parseFloat(mtr1.value);
 
-  if( used.value < 1 ) return;
+  if( n <= lastlog ) { alert('number must be greater than previous record.'); return; }
 
-  if( isNaN(used.value) ) return;
+  if( isNaN(n) ) { alert('record must be digit-only'); return; }
 
   x.addEventListener('readystatechange',()=>{
     if( x.readyState === 1 ) {
@@ -72,7 +74,7 @@ function record_usage() {
   });
 
   x.open('POST', 'api/record_usage.php');
-  x.send(btoa([obj.id,used.value]));
+  x.send(btoa([obj.id,n]));
 }
 
 const prevr = document.getElementById('prevr');
@@ -107,10 +109,14 @@ function displayTable(o) {
 
   let r0 = tb.insertRow(-1),
       c0 = r0.insertCell(0),
-      c1 = r0.insertCell(1);
+      c1 = r0.insertCell(1),
+      c2 = r0.insertCell(2);
 
   c0.innerText = utc2local(o.created_at);
-  c1.innerText = cubicmtr(o.m3_used);
+  c1.innerText = o.meter;
+  c2.innerText = cubicmtr(o.m3);
+
+  lastlog = Math.max(o.meter,lastlog);
 }
 
 function utc2local(ts) {
@@ -118,7 +124,7 @@ function utc2local(ts) {
 }
 
 function cubicmtr(n) {
-  return `${n}\u33A5`;
+  return `${n.toFixed(2)}\u33A5`;
 }
 
 function init() {

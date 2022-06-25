@@ -45,11 +45,13 @@ function get_consumer() {
   x.addEventListener('readystatechange',()=>{
     if( x.readyState === 1 ) {
       tbl1.style.display = 'none';
+      find.setAttribute('aria-busy',true);
     }
 
     if( x.readyState === 4 ) {
       JSON.parse(x.responseText).forEach(o=>displayTable(o));
       tbl1.style.display = 'inline-table';
+      find.removeAttribute('aria-busy');
     }
   });
 

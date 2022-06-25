@@ -80,6 +80,9 @@ function login() {
 }  
 
 btn1.addEventListener('click',login);
+document.addEventListener('keyup',(e)=>{
+  if ( e.keyCode === 13 ) login();
+});
 </script>
 </body>
 </html>

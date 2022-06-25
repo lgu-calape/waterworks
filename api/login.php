@@ -36,7 +36,8 @@ if ( $req === 'POST' ) {
   if ( $role === 3 )
     header('location: ../reader.html');
 
-  exit;
+  if ( in_array($role,[1,2,3]) )
+    exit;
 }
 
 http_response_code(403);

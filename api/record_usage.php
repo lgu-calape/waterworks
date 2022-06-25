@@ -23,7 +23,9 @@ if ( $req === 'POST' ) {
   $cid = filter_var($n1, FILTER_VALIDATE_INT);
   $amt = filter_var($n2, FILTER_VALIDATE_FLOAT);
 
-  $db->record_usage($cid,$rid, $amt);
+  $mid = $db->get_consumer_meter_id($cid);
+
+  $db->record_usage($mid,$rid, $amt);
 
   exit;
 }
