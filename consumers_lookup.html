@@ -55,7 +55,7 @@ function get_consumer() {
     }
   });
 
-  x.open('GET', 'api/consumer_by_brgy.php?id='+localStorage.getItem('brgy_id'));
+  x.open('GET', 'api/consumers_by_brgy.php?id='+localStorage.getItem('brgy_id'));
   x.send();
 }
 

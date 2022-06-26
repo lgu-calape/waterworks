@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://unpkg.com/@picocss/pico@1.4.4/css/pico.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"> 
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+<link href="https://fonts.googleapis.com/css2?family=Kdam+Thmor+Pro&display=swap" rel="stylesheet">
+<title>Meter Reading</title>
+<style>
+body{font-family: "Kdam Thmor Pro";}
+input{text-transform: uppercase;}
+#tlabel0,#tlabel1{background:#888;color:#fff;text-align:center;border-radius:0.25rem;padding:0.75rem;}
+</style>    
+</head>
+<body>
+<main class="container">
+  <article>
+    <h4 id="tlabel0">CONSUMER INFO</h4>
+    <figure>
+    <table role="grid">
+      <tr><th>Name</th><td id="consumer_name" colspan="2"></td></tr>
+      <tr><th>Meter</th><td id="meter_serial" colspan="2"></td></tr>
+      <tr><th>Barangay</th><td id="barangay" colspan="2"></td></tr>
+      <tr><th>Address</th><td id="address" colspan="2"></td></tr>
+      <tr><th>Contact #</th><td id="phone" colspan="2"></td></tr>
+    </table>
+    </figure>
+    <h4 id="tlabel1">METER RECORDS</h4>
+    <figure>
+    <table id="tbl1">
+      <thead>
+        <tr><th>DATE</th><th>READING</th><th>USED&#x33A5;</th></tr>
+      </thead>
+      <tbody>
+        <!-- populate data -->
+      </tbody>
+    </table>
+    </figure>
+    <br><hr><br>
+    <button class="secondary" onclick="location.assign('consumers_record.html');">LOOK UP</button>
+  </article>
+</main>
+<script>
+const obj = JSON.parse(localStorage.getItem('record'));
+
+function get_consumer_info() {
+  let x = new XMLHttpRequest();
+
+  x.addEventListener('readystatechange',()=>{
+    if ( x.readyState === 1 ) {
+      tlabel0.setAttribute('aria-busy',true);
+    }
+
+    if ( x.readyState === 4 ) {
+      if ( x.status === 200 ) {
+        let c = JSON.parse(x.responseText);
+        barangay.innerText = c.brgy;
+        address.innerText = c.address;
+        phone.innerText = c.phone;
+      }
+
+      tlabel0.removeAttribute('aria-busy');
+    }
+  });
+
+  x.open('GET','api/get_consumer_info.php?id='+obj.id);
+  x.send();
+}
+
+function get_readings() {
+  let x = new XMLHttpRequest();
+
+  x.addEventListener('readystatechange',()=>{
+    if( x.readyState === 1 ) {
+      tlabel1.setAttribute('aria-busy',true);
+    }
+
+    if( x.readyState === 4 ) {
+      if( x.status === 200 ) {
+        JSON.parse(x.responseText).forEach(o=>displayTable(o))
+        tlabel1.removeAttribute('aria-busy');
+        tbl1.style.display = 'inline-table';
+      }
+
+      if( x.status === 204 ) {
+        tlabel1.remove();tbl1.remove();
+      }
+    }
+  });
+
+  x.open('GET','api/readings.php?consumer_id='+obj.id);
+  x.send();
+}
+
+function displayTable(o) {
+  let tb = tbl1.getElementsByTagName('tbody')[0];
+
+  let r0 = tb.insertRow(-1),
+      c0 = r0.insertCell(0),
+      c1 = r0.insertCell(1),
+      c2 = r0.insertCell(2);
+
+  c0.innerText = utc2local(o.created_at);
+  c1.innerText = o.meter;
+  c2.innerText = cubicmtr(o.m3);
+}
+
+function utc2local(ts) {
+  return new Date(parseInt(ts)).toLocaleString("en-US", {timeZone: 'Asia/Manila', hour12: true});
+}
+
+function cubicmtr(n) {
+  return `${n.toFixed(2)}\u33A5`;
+}
+
+function init() {
+  consumer_name.innerText = obj.name;
+  meter_serial.innerText = obj.meter_no;
+
+  tbl1.style.display = 'none';
+
+  setTimeout(get_readings,300);
+  setTimeout(get_consumer_info,300);
+}
+
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>

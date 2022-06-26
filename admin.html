@@ -14,13 +14,19 @@ input{text-transform: uppercase;}
 </style>    
 </head>
 <body>
-  <main class="container">
-    <article>
-      <button id="btn1">CONSUMERS RECORD</button>
-      <button id="btn1">BILLINGS RECORD</button>
-      <button id="btn1">MANAGEMENT</button>
-      <button class="secondary" onclick="location.assign('login.html');">LOGOUT</button>
-    </article>
-  </main>
+<main class="container">
+  <article>
+    <button id="btn1">CONSUMERS RECORD</button>
+    <button id="btn2">BILLINGS RECORD</button>
+    <button id="btn3">MANAGEMENT</button>
+    <button id="btn4" class="secondary">LOGOUT</button>
+  </article>
+</main>
+<script>
+btn1.addEventListener('click',()=>location.assign('consumers_record.html'));
+btn2.addEventListener('click',()=>alert('work in progress'));
+btn3.addEventListener('click',()=>alert('work in progress'));
+btn4.addEventListener('click',()=>location.assign('logout.php'));
+</script>
 </body>
 </html>

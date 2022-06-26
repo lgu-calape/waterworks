@@ -56,7 +56,14 @@ class Database extends SQLite3 {
     return $x->fetchArray(SQLITE3_NUM)[0];
   }
 
-  public function get_consumer_by_brgy($brgy_id) {
+  public function get_consumer_info($id) {
+    $p = $this->prepare("SELECT a.name,a.bod,a.phone,a.address,a.meter_id,b.serial_no meter_serial_no,c.name brgy FROM consumers a JOIN meters b ON a.meter_id=b.id JOIN barangays c ON a.barangay_id=c.id WHERE a.id=:id");
+    $p->bindParam(":id", $id, SQLITE3_INTEGER);
+
+    return $p->execute()->fetchArray(SQLITE3_ASSOC);
+  }
+
+  public function get_consumers_by_brgy($brgy_id) {
     $p = $this->prepare("SELECT a.id,a.name,b.serial_no meter_no FROM consumers a JOIN meters b ON a.meter_id=b.id WHERE a.barangay_id=:bid ORDER BY a.name ASC");
     $p->bindParam(":bid", $brgy_id);
 

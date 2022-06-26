@@ -13,4 +13,4 @@ if( !$db->session_get($sid) )
 
 $brgy_id = filter_input(INPUT_GET, 'id',FILTER_VALIDATE_INT);
 
-echo json_encode($db->get_consumer_by_brgy($brgy_id));
+echo json_encode($db->get_consumers_by_brgy($brgy_id));

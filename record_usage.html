@@ -30,7 +30,7 @@ input{text-transform: uppercase;}
       </tbody>
     </table>
     <br><hr><br>
-    <button class="secondary" onclick="location.assign('consumer_lookup.html');">LOOK UP</button>
+    <button class="secondary" onclick="location.assign('consumers_lookup.html');">LOOK UP</button>
     <br><p style="text-align:center;">You are reading in barangay <span id="brgy">...</span></p>
   </article>
 </main>
@@ -120,7 +120,7 @@ function displayTable(o) {
 }
 
 function utc2local(ts) {
-  return new Date(parseInt(ts)).toLocaleString("en-US", {timeZone: 'Asia/Manila', hour12: true});
+  return new Date(parseInt(ts)).toLocaleDateString("en-US", {timeZone: 'Asia/Manila', hour12: true});
 }
 
 function cubicmtr(n) {

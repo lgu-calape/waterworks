@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://unpkg.com/@picocss/pico@1.4.4/css/pico.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"> 
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+<link href="https://fonts.googleapis.com/css2?family=Kdam+Thmor+Pro&display=swap" rel="stylesheet">
+<title>Meter Reading</title>
+<style>
+body{font-family: "Kdam Thmor Pro";}
+input{text-transform: uppercase;}
+tbody>tr:hover{background:#eee;cursor:pointer;}
+</style>    
+</head>
+<body>
+<main class="container">
+  <article>
+    <select id="brgy">
+      <!--generate-->
+    </select>
+    <input type="text" id="look" placeholder="consumer name / meter #">
+    <progress id="prog"></progress>
+    <table id="tbl1">
+      <thead>
+        <tr><th>Name</th><th>Meter No.</th></tr>
+      </thead>
+      <tbody>
+        <!-- populate data -->
+      </tbody>
+    </table>
+    <br><hr><br>
+    <button class="secondary" id="btn1">LOGOUT</button>
+  </article>
+</main>
+<script>
+const brgyid = localStorage.getItem('brgy_id') || 28;
+
+function get_brgy() {
+  let x = new XMLHttpRequest();
+
+  x.addEventListener('readystatechange',()=>{
+    if( x.readyState === 4 ) {
+      if( x.status === 200 ) {
+        let d = JSON.parse(x.responseText);
+
+        d.forEach((i)=>{
+          let o = document.createElement('option');
+          o.text = i.name;
+          o.value = i.id;
+
+          if( i.id == brgyid )
+            o.selected = true;
+
+          brgy.add(o);
+        });
+
+        setTimeout(get_consumers,300);
+      }
+    }
+  });
+
+  x.open('GET','api/barangay.php');
+  x.send();
+}
+
+function get_consumers() {
+  let x = new XMLHttpRequest();
+
+  x.addEventListener('readystatechange',()=>{
+    if( x.readyState === 1 ) {
+      prog.style.display = 'inline-block';
+      tbl1.style.display = 'none';empty_table();
+    }
+
+    if( x.readyState === 4 ) {
+      prog.style.display = 'none';
+      JSON.parse(x.responseText).forEach(o=>displayTable(o));
+      tbl1.style.display = 'inline-table';
+      localStorage.setItem('brgy_id',brgy.value);
+    }
+  });
+
+  x.open('GET', 'api/consumers_by_brgy.php?id='+brgy.value);
+  x.send();
+}
+
+function record(o) {
+  localStorage.setItem('record', JSON.stringify(o));
+  location.assign('consumer_record.html');
+}
+
+look.addEventListener('keyup',filterTable);
+
+function filterTable(event) {
+  var filter = event.target.value.toUpperCase();
+  var rows = document.querySelector("#tbl1 tbody").rows;
+    
+  for (var i = 0; i < rows.length; i++) {
+    var firstCol = rows[i].cells[0].textContent.toUpperCase();
+    var secondCol = rows[i].cells[1].textContent.toUpperCase();
+    if (firstCol.indexOf(filter) > -1 || secondCol.indexOf(filter) > -1) {
+      rows[i].style.display = "";
+    } else {
+      rows[i].style.display = "none";
+    }      
+  }
+}
+
+function displayTable(o) {
+  let tb = tbl1.getElementsByTagName('tbody')[0];
+
+  let r0 = tb.insertRow(-1),
+      c0 = r0.insertCell(0),
+      c1 = r0.insertCell(1);
+
+  c0.innerText = o.name;
+  c1.innerText = o.meter_no;
+
+  r0.addEventListener('click',()=>record(o));
+}
+
+function empty_table() {
+  let tbody = tbl1.getElementsByTagName('tbody')[0];
+
+  Array.from(tbody.rows).forEach((tr) => tbody.deleteRow(tr));
+}
+
+brgy.addEventListener('change',get_consumers);
+btn1.addEventListener('click',()=>location.assign('logout.php'));
+document.addEventListener('DOMContentLoaded',get_brgy);
+</script>
+</body>
+</html>
