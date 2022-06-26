@@ -30,8 +30,11 @@ tbody>tr:hover{background:#eee;cursor:pointer;}
         <!-- populate data -->
       </tbody>
     </table>
+    <button id="btn0">ADD RECORD</button>
     <br><hr><br>
-    <button class="secondary" id="btn1">LOGOUT</button>
+    <button class="secondary" id="btn1">ADMIN MENU</button>
+    <br>
+    <p>TOTAL CONSUMPTION: 0&#x33A5; / PAYMENTS COLLECTED: &#8369;0.00</p>
   </article>
 </main>
 <script>
@@ -79,6 +82,7 @@ function get_consumers() {
       JSON.parse(x.responseText).forEach(o=>displayTable(o));
       tbl1.style.display = 'inline-table';
       localStorage.setItem('brgy_id',brgy.value);
+      localStorage.setItem('brgy_name', brgy.options[brgy.selectedIndex].text);
     }
   });
 
@@ -128,7 +132,8 @@ function empty_table() {
 }
 
 brgy.addEventListener('change',get_consumers);
-btn1.addEventListener('click',()=>location.assign('logout.php'));
+btn0.addEventListener('click',()=>location.assign('new_consumer.html'));
+btn1.addEventListener('click',()=>location.assign('admin.html'));
 document.addEventListener('DOMContentLoaded',get_brgy);
 </script>
 </body>

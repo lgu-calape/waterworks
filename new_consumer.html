@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://unpkg.com/@picocss/pico@1.4.4/css/pico.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"> 
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+<link href="https://fonts.googleapis.com/css2?family=Kdam+Thmor+Pro&display=swap" rel="stylesheet">
+<title>Meter Reading</title>
+<style>
+body{font-family: "Kdam Thmor Pro";}
+input{text-transform: uppercase;}
+#tlabel0,#tlabel1{background:#888;color:#fff;text-align:center;border-radius:0.25rem;padding:0.75rem;}
+</style>    
+</head>
+<body>
+<main class="container">
+  <article>
+    <h4 id="tlabel0">CONSUMER INFO</h4>
+    <form>
+      <input type="text" id="consumer_name" placeholder="consumer name">
+      <input type="text" id="contact" placeholder="contact #">
+      <input type="text" id="address" placeholder="Purok / Sitio">
+      <input type="text" id="barangay" placeholder="Barangay">
+      <button id="btn0">ADD & SAVE</button>
+    </form>
+    <br><hr><br>
+    <button class="secondary" onclick="location.assign('consumers_record.html');">LOOK UP</button>
+  </article>
+</main>
+<script>
+function add_consumer_info() {
+  let x = new XMLHttpRequest();
+
+  x.addEventListener('readystatechange',()=>{
+    if ( x.readyState === 1 ) {
+      tlabel0.setAttribute('aria-busy',true);
+    }
+
+    if ( x.readyState === 4 ) {
+      if ( x.status === 200 ) {
+        let c = JSON.parse(x.responseText);
+        barangay.innerText = c.brgy;
+        address.innerText = c.address;
+        phone.innerText = c.phone;
+      }
+
+      tlabel0.removeAttribute('aria-busy');
+    }
+  });
+
+  x.open('GET','api/get_consumer_info.php?id='+obj.id);
+  x.send();
+}
+
+function init() {
+  barangay.readOnly = true;
+  barangay.value = localStorage.getItem('brgy_name');
+}
+
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>
