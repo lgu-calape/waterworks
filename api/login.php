@@ -36,7 +36,10 @@ if ( $req === 'POST' ) {
   if ( $role === 3 )
     header('location: ../reader.html');
 
-  if ( in_array($role,[1,2,3]) )
+  if ( $role === 4 )
+    header('location: ../plumber.html');
+
+  if ( in_array($role,[1,2,3,4]) )
     exit;
 }
 

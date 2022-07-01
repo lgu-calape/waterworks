@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://unpkg.com/@picocss/pico@1.4.4/css/pico.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"> 
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+<link href="https://fonts.googleapis.com/css2?family=Kdam+Thmor+Pro&display=swap" rel="stylesheet">
+<title>ADMIN @ WATERWORKS</title>
+<style>
+body{font-family: "Kdam Thmor Pro";}
+input{text-transform: uppercase;}
+</style>    
+</head>
+<body>
+<main class="container">
+  <article>
+    <button id="btn1">CONSUMERS RECORD</button>
+    <button id="btn2">WORK ORDERS</button>
+    <button id="btn4" class="secondary">LOGOUT</button>
+  </article>
+</main>
+<script>
+btn1.addEventListener('click',()=>location.assign('consumers_nometer.html'));
+btn2.addEventListener('click',()=>alert('work in progress'));
+btn3.addEventListener('click',()=>alert('work in progress'));
+btn4.addEventListener('click',()=>location.assign('logout.php'));
+</script>
+</body>
+</html>

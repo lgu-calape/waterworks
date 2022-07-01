@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://unpkg.com/@picocss/pico@1.4.4/css/pico.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"> 
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+<link href="https://fonts.googleapis.com/css2?family=Kdam+Thmor+Pro&display=swap" rel="stylesheet">
+<title>Meter Reading</title>
+<style>
+body{font-family: "Kdam Thmor Pro";}
+input{text-transform: uppercase;}
+#tlabel0,#tlabel1{background:#888;color:#fff;text-align:center;border-radius:0.25rem;padding:0.75rem;}
+</style>    
+</head>
+<body>
+<main class="container">
+  <article>
+    <h4 id="tlabel0">METER INFO</h4>
+    <fieldset>
+      <input type="text" id="brand" placeholder="brand">
+      <input type="text" id="serialno" placeholder="serial number">
+      <textarea id="notes" placeholder="additional note if any."></textarea>
+      <button id="btn0">SAVE & CONTINUE</button>
+    </fieldset>
+    <br><hr><br>
+    <button class="secondary" onclick="location.assign('consumers_record.html');">LOOK UP</button>
+  </article>
+</main>
+<script>
+function add_meter() {
+  let brandname = brand.value,
+      serialnum = serialno.value;
+
+  if ( brandname.length < 2 ) {
+    alert('BRAND REQUIRED');
+    return;
+  }
+
+  if ( serialnum.length < 6 ) {
+    alert('SERIAL # REQUIRED');
+    return;
+  }
+
+  let x = new XMLHttpRequest();
+
+  x.addEventListener('readystatechange',()=>{
+    if ( x.readyState === 1 ) {
+      btn0.disabled = true;
+      btn0.setAttribute('aria-busy',true);
+    }
+
+    if ( x.readyState === 4 ) {
+      if ( x.status === 200 ) {
+        brand.disabled = true;
+        serialno.disabled = true;
+        notes.disabled = true;
+        localStorage.setItem('meter_id',x.responseText);
+        location.assign('new_consumer.html');
+      }
+
+      btn0.removeAttribute('aria-busy');
+    }
+  });
+
+  x.open('POST', 'api/new_meter.php');
+  x.send(btoa(JSON.stringify([brandname,serialnum,notes.value])));
+}
+
+btn0.addEventListener('click',add_meter);
+</script>
+</body>
+</html>

@@ -17,54 +17,23 @@ tbody>tr:hover{background:#eee;cursor:pointer;}
 <body>
 <main class="container">
   <article>
-    <select id="brgy">
-      <!--generate-->
-    </select>
-    <input type="text" id="look" placeholder="consumer name / meter #">
+    <input type="text" id="look" placeholder="consumer's name">
     <progress id="prog"></progress>
     <table id="tbl1">
       <thead>
-        <tr><th>Name</th><th>Meter No.</th></tr>
+        <tr><th>Name</th><th>Barangay</th></tr>
       </thead>
       <tbody>
         <!-- populate data -->
       </tbody>
     </table>
     <br><hr><br>
-    <button class="secondary" id="btn1">ADMIN MENU</button>
-    <br>
-    <p>TOTAL CONSUMPTION: 0&#x33A5; / PAYMENTS COLLECTED: &#8369;0.00</p>
+    <button class="secondary" id="btn1">PLUMBER MENU</button>
   </article>
 </main>
 <script>
-const brgyid = localStorage.getItem('brgy_id') || 28;
-
-function get_brgy() {
-  let x = new XMLHttpRequest();
-
-  x.addEventListener('readystatechange',()=>{
-    if( x.readyState === 4 ) {
-      if( x.status === 200 ) {
-        let d = JSON.parse(x.responseText);
-
-        d.forEach((i)=>{
-          let o = document.createElement('option');
-          o.text = i.name;
-          o.value = i.id;
-
-          if( i.id == brgyid )
-            o.selected = true;
-
-          brgy.add(o);
-        });
-
-        setTimeout(get_consumers,300);
-      }
-    }
-  });
-
-  x.open('GET','api/barangay.php');
-  x.send();
+function add_meter(o) {
+  console.log(o);
 }
 
 function get_consumers() {
@@ -77,24 +46,21 @@ function get_consumers() {
     }
 
     if( x.readyState === 4 ) {
-      prog.style.display = 'none';
-      JSON.parse(x.responseText).forEach(o=>displayTable(o));
-      tbl1.style.display = 'inline-table';
-      localStorage.setItem('brgy_id',brgy.value);
-      localStorage.setItem('brgy_name', brgy.options[brgy.selectedIndex].text);
+      if ( x.status === 200 ) {
+        prog.style.display = 'none';
+        JSON.parse(x.responseText).forEach(o=>displayTable(o));
+        tbl1.style.display = 'inline-table';
+      }
+
+      if ( x.status === 204 ) {
+        prog.style.display = tbl1.style.display = 'none';
+      }
     }
   });
 
-  x.open('GET', 'api/consumers_by_brgy.php?id='+brgy.value);
+  x.open('GET', 'api/get_consumers_nometer.php');
   x.send();
 }
-
-function record(o) {
-  localStorage.setItem('record', JSON.stringify(o));
-  location.assign('consumer_record.html');
-}
-
-look.addEventListener('keyup',filterTable);
 
 function filterTable(event) {
   var filter = event.target.value.toUpperCase();
@@ -119,9 +85,9 @@ function displayTable(o) {
       c1 = r0.insertCell(1);
 
   c0.innerText = o.name;
-  c1.innerText = o.meter_no;
+  c1.innerText = o.brgy_name;
 
-  r0.addEventListener('click',()=>record(o));
+  r0.addEventListener('click',()=>add_meter(o));
 }
 
 function empty_table() {
@@ -130,9 +96,8 @@ function empty_table() {
   Array.from(tbody.rows).forEach((tr) => tbody.deleteRow(tr));
 }
 
-brgy.addEventListener('change',get_consumers);
-btn1.addEventListener('click',()=>location.assign('admin.html'));
-document.addEventListener('DOMContentLoaded',get_brgy);
+btn1.addEventListener('click',()=>location.assign('plumber.html'));
+document.addEventListener('DOMContentLoaded',get_consumers);
 </script>
 </body>
 </html>

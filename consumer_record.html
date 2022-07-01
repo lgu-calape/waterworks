@@ -27,7 +27,6 @@ input{text-transform: uppercase;}
       <tr><th>Contact #</th><td id="phone"></td></tr>
     </table>
     </figure>
-    <button id="btn0">UPDATE INFO</button>
     <h4 id="tlabel1">METER RECORDS</h4>
     <figure>
     <table id="tbl1">
@@ -57,7 +56,7 @@ function get_consumer_info() {
     if ( x.readyState === 4 ) {
       if ( x.status === 200 ) {
         let c = JSON.parse(x.responseText);
-        barangay.innerText = c.brgy;
+        barangay.innerText = c.brgy + ' \u270E';
         address.innerText = c.address;
         phone.innerText = c.phone;
       }
@@ -118,7 +117,7 @@ function cubicmtr(n) {
 
 function init() {
   consumer_name.innerText = obj.name;
-  meter_serial.innerText = obj.meter_no;
+  meter_serial.innerText = obj.meter_no + ' \u270E';
 
   tbl1.style.display = 'none';
 

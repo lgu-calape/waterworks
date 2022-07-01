@@ -18,40 +18,75 @@ input{text-transform: uppercase;}
 <main class="container">
   <article>
     <h4 id="tlabel0">CONSUMER INFO</h4>
-    <form>
+    <fieldset>
       <input type="text" id="consumer_name" placeholder="consumer name">
       <input type="text" id="contact" placeholder="contact #">
       <input type="text" id="address" placeholder="Purok / Sitio">
       <input type="text" id="barangay" placeholder="Barangay">
       <button id="btn0">ADD & SAVE</button>
-    </form>
+    </fieldset>
     <br><hr><br>
     <button class="secondary" onclick="location.assign('consumers_record.html');">LOOK UP</button>
   </article>
 </main>
 <script>
-function add_consumer_info() {
+const brgy_id = localStorage.getItem('brgy_id'),
+     meter_id = localStorage.getItem('meter_id');
+
+if( !meter_id ) {
+  location.assign('consumers_nometer.html');
+}
+
+
+function add_record() {
+  let ngan = consumer_name.value,
+      kontak = contact.value,
+      purok = address.value;
+
+  console.log(ngan,kontak,purok);
+
+  if ( ngan.length < 5 ) {
+    alert('CONSUMER NAME REQUIRED');
+    return;
+  }
+
+  if ( kontak.length < 10 ) {
+    alert('PHONE REQUIRED');
+    return;
+  }
+
+  if ( purok.length < 7 ) {
+    alert('PUROK REQUIRED');
+    return;
+  }
+
   let x = new XMLHttpRequest();
 
   x.addEventListener('readystatechange',()=>{
     if ( x.readyState === 1 ) {
-      tlabel0.setAttribute('aria-busy',true);
+      btn0.disabled = true;
+      btn0.setAttribute('aria-busy',true);
     }
 
     if ( x.readyState === 4 ) {
       if ( x.status === 200 ) {
-        let c = JSON.parse(x.responseText);
-        barangay.innerText = c.brgy;
-        address.innerText = c.address;
-        phone.innerText = c.phone;
+        consumer_name.disabled = true;
+        contact.disabled = true;
+        address.disabled = true;
+        barangay.disabled = true;
       }
 
-      tlabel0.removeAttribute('aria-busy');
+      if ( x.status === 403 ) {
+        alert('forbidden');
+        btn0.disabled = false;
+      }
+
+      btn0.removeAttribute('aria-busy');
     }
   });
 
-  x.open('GET','api/get_consumer_info.php?id='+obj.id);
-  x.send();
+  x.open('POST', 'api/new_consumer.php');
+  x.send(btoa(JSON.stringify([ngan,kontak,purok,brgy_id,meter_id])));
 }
 
 function init() {
@@ -59,6 +94,7 @@ function init() {
   barangay.value = localStorage.getItem('brgy_name');
 }
 
+btn0.addEventListener('click',add_record);
 document.addEventListener('DOMContentLoaded',init);
 </script>
 </body>

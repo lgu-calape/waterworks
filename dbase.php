@@ -1,4 +1,3 @@
-
 <?php
 class Database extends SQLite3 {
 
@@ -77,6 +76,18 @@ class Database extends SQLite3 {
     return $a;
   }
 
+  public function get_consumers_nometer() {
+    $p = $this->prepare("SELECT a.id,a.name,b.id AS brgy_id,b.name AS brgy_name FROM consumers a JOIN barangays b ON a.barangay_id=b.id WHERE a.meter_id IS NULL ORDER BY a.name ASC");
+    $x = $p->execute();
+
+    $a = [];
+
+    while( $r = $x->fetchArray(SQLITE3_ASSOC) )
+      array_push($a, $r);
+
+    return $a;
+  }
+
   public function get_consumer_meter_id($id) {
     $p = $this->prepare("SELECT meter_id FROM consumers WHERE id=:id");
     $p->bindParam(":id", $id, SQLITE3_INTEGER);
@@ -119,5 +130,33 @@ class Database extends SQLite3 {
       array_push($a, $r);
 
     return $a;
+  }
+
+  public function new_meter($brand,$serial,$note) {
+    $brand = strtoupper($brand);
+    $serial = strtoupper($serial);
+
+    $p = $this->prepare("INSERT INTO meters(brand,serial_no,note) VALUES(:f1,:f2,:f3)");
+    $p->bindParam(":f1", $brand);
+    $p->bindParam(":f2", $serial);
+    $p->bindParam(":f3", $note);
+    $p->execute();
+
+    return $this->lastInsertRowID();
+  }
+
+  public function new_consumer($name,$phone,$addr,$brgy,$meter) {
+    $name = strtoupper($name);
+    $addr = strtoupper($addr);
+
+    $p = $this->prepare("INSERT INTO consumers(name,phone,address,barangay_id,meter_id) VALUES(:f1,:f2,:f3,:f4,:f5)");
+    $p->bindParam(":f1", $name);
+    $p->bindParam(":f2", $phone);
+    $p->bindParam(":f3", $addr);
+    $p->bindParam(":f4", $brgy);
+    $p->bindParam(":f5", $meter);
+    $p->execute();
+
+    return $this->lastInsertRowID();
   }
 }
